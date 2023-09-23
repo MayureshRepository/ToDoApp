@@ -8,7 +8,7 @@ body{
 
 h1{
    
-    background-image: url('flower.jpeg');
+    background-image: url('./images/flower.jpeg');
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -73,7 +73,7 @@ button{
     width: 5rem;
     border: none;
     height: 2rem;
-    background: url('C:/Users/mpatr/OneDrive/Desktop/ToDo/flower.jpeg');
+    background: url('/images/flower.jpeg');
     border-radius: 3px;
     color: white;
     font-weight: 700;
