@@ -8,7 +8,7 @@ body{
 
 h1{
    
-    background-image: url('../ToDo/flower.jpeg');
+    background-image: url('flower.jpeg');
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
