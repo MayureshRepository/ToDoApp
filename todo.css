@@ -7,11 +7,12 @@ body{
 }
 
 h1{
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    font-size: 48px;
+    text-shadow: 1px 4px orange ;
    
-    background-image: url('./images/flower.jpeg');
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+
 }
 .title{
     text-align: center;
@@ -73,7 +74,7 @@ button{
     width: 5rem;
     border: none;
     height: 2rem;
-    background: url('/images/flower.jpeg');
+    background: url('./images/flower.jpeg');
     border-radius: 3px;
     color: white;
     font-weight: 700;
