@@ -94,7 +94,7 @@ function deleteToDo(countId){
 
 }
 
-//for collecting data from Click  button
+//for collecting data from Click  button  
 function saveData(){
     var inputdata = typedText.value;
     if(!inputdata){
