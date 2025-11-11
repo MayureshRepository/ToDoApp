@@ -1,52 +1,68 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>
-            To Do App
-        </title>
-      <link rel="stylesheet" href="todo.css">
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>To‑Do — Upgraded</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="todo.css">
+</head>
+<body>
+  <main class="app" aria-labelledby="title">
+    <header>
+      <h1 id="title">To‑Do App</h1>
+      <p class="subtitle">Fast. Editable. Saved on this device.</p>
+    </header>
 
-    </head>
+    <section class="input-row" aria-label="Add a task">
+      <div class="input">
+        <input id="newTask" type="text" placeholder="Add a task and hit Enter…" autocomplete="off" />
+      </div>
+      <button id="addBtn" class="btn btn-primary" aria-label="Add task">Save</button>
+    </section>
 
-    <body>
-        
-       
- 
-        <div class="body">
+    <div class="toolbar">
+      <div class="filters" role="tablist" aria-label="Filters">
+        <button class="chip" data-filter="all" aria-pressed="true">All</button>
+        <button class="chip" data-filter="active" aria-pressed="false">Active</button>
+        <button class="chip" data-filter="completed" aria-pressed="false">Completed</button>
+      </div>
+      <div class="row">
+        <button id="clearCompleted" class="btn btn-ghost">Clear completed</button>
+        <button id="selectAll" class="btn btn-ghost">Toggle all</button>
+      </div>
+    </div>
 
+    <ul id="list" class="list" aria-live="polite" aria-label="Task list"></ul>
 
-            <h1 class="title">To Do App</h1>
+    <div class="footer">
+      <span class="counter"> <span id="leftCount">0</span> tasks left</span>
+      <span class="meta" id="meta"></span>
+    </div>
+  </main>
 
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
-            <div class="container">
-                <div class="screenAndButton" style="display: inline;">
-                    <input type="text" id="screenInput" class="screen" placeholder="Click Enter or Save Button">
-                    <button onclick="saveData()">Save</button>
+  <template id="itemTemplate">
+    <li class="item">
+      <input type="checkbox" class="checkbox" />
+      <div>
+        <div class="title"></div>
+        <div class="meta"></div>
+      </div>
+      <div class="row">
+        <button class="icon-btn edit" title="Edit" aria-label="Edit task">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 20h4l10.5-10.5a2.121 2.121 0 1 0-3-3L5 17v3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="icon-btn remove" title="Delete" aria-label="Delete task">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </li>
+  </template>
 
-                </div>
-                
-
-
-                <ul id="list">
-
-    
-                    
-                </ul>
-
-
-
-                <div class="counter">
-                    <span id="counter">0</span> &nbsp;
-                    Tasks Left
-                </div>
-
-            </div>
-
-
-        </div>
-
-
-
-        <script src="todo.js"></script>
-    </body>
+  <script src="todo.js"></script>
+</body>
 </html>

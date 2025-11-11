@@ -1,176 +1,124 @@
-console.log('Hello');
-let tasks=[];
-const countdata = document.getElementById('counter');
-const typedText = document.getElementById('screenInput');
-var taskList = document.getElementById('list');
-var count =0 ;
+// ====== State & Persistence ======
+const STORAGE_KEY = 'todos-v2';
+/** @type {{id:number, text:string, done:boolean, created:number}[]} */
+let tasks = load();
+let filter = 'all'; // all | active | completed
 
-function popAlert(message){
-    alert(message);
+function load(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [] }catch{ return [] }
+}
+function persist(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)) }
+
+// ====== Elements ======
+const listEl = document.getElementById('list');
+const template = document.getElementById('itemTemplate');
+const newTask = document.getElementById('newTask');
+const addBtn = document.getElementById('addBtn');
+const leftCount = document.getElementById('leftCount');
+const meta = document.getElementById('meta');
+const toast = document.getElementById('toast');
+const chips = [...document.querySelectorAll('.chip')];
+
+// ====== Utilities ======
+function toastMsg(msg){
+  toast.textContent = msg; toast.classList.add('show');
+  setTimeout(()=> toast.classList.remove('show'), 1400);
+}
+function fmtDate(ts){
+  const d = new Date(ts); return d.toLocaleString([], {dateStyle:'medium', timeStyle:'short'});
 }
 
-
-function AddToDom(task){
-
-    const list = document.createElement('div');
-
-    list.innerHTML= `
-    <div class="card">
-   
-   
-    <input type="checkbox" id="${task.count}" ${task.done? 'checked' : ''}    class="custom-checkbox" >
-
-    <label class="details" >
-    ${task.data}
-
-    <span    ><img src="delete.png"  class="delete"  id="${task.count}" alt="deleteIcon"></span>
-
-
-    
-       
-    </label>
-</div>
-
-
-    `;
-
-    taskList.append(list);
+// ====== CRUD ======
+function addTask(text){
+  text = text.trim();
+  if(!text) return;
+  const task = { id: Date.now(), text, done:false, created: Date.now() };
+  tasks.unshift(task); // newest on top
+  persist(); render(); toastMsg('Task added');
+}
+function toggleTask(id){
+  const t = tasks.find(t=>t.id===id); if(!t) return; t.done = !t.done; persist(); render();
+}
+function updateTask(id, text){
+  const t = tasks.find(t=>t.id===id); if(!t) return; t.text = text.trim() || t.text; persist(); render(); toastMsg('Task updated');
+}
+function removeTask(id){
+  tasks = tasks.filter(t=>t.id!==id); persist(); render(); toastMsg('Task removed');
+}
+function clearCompleted(){ tasks = tasks.filter(t=>!t.done); persist(); render(); }
+function toggleAll(){
+  const allDone = tasks.length && tasks.every(t=>t.done);
+  tasks.forEach(t=> t.done = !allDone);
+  persist(); render();
 }
 
+// ====== Rendering ======
+function render(){
+  listEl.innerHTML = '';
+  const visible = tasks.filter(t=> filter==='active' ? !t.done : filter==='completed' ? t.done : true);
 
-function renderList(){
+  if(!visible.length){
+    const empty = document.createElement('div');
+    empty.className = 'empty';
+    empty.textContent = 'No tasks here. Add one!';
+    listEl.append(empty);
+  } else {
+    for(const t of visible){
+      const node = template.content.firstElementChild.cloneNode(true);
+      node.dataset.id = String(t.id);
+      const cb = node.querySelector('.checkbox');
+      const title = node.querySelector('.title');
+      const metaEl = node.querySelector('.meta');
 
-   taskList.innerHTML='';
-  
+      cb.checked = t.done;
+      title.textContent = t.text;
+      metaEl.textContent = 'Created ' + fmtDate(t.created);
+      if(t.done) node.classList.add('completed');
 
-    for(let i=0;i<tasks.length;i++){
-        AddToDom(tasks[i]);
+      listEl.append(node);
     }
+  }
 
-    countdata.innerHTML = tasks.length;
+  const left = tasks.filter(t=>!t.done).length;
+  leftCount.textContent = left;
+  meta.textContent = tasks.length ? `${tasks.length} total • ${new Date().toLocaleDateString()}` : '';
 
+  // update filter chips
+  chips.forEach(ch => ch.setAttribute('aria-pressed', String(ch.dataset.filter===filter)));
 }
 
-function markAsComplete(countId){
-    const taskToggle = tasks.filter(function(task){
-        return task.id === countId ;
-    });
+// ====== Events ======
+addBtn.addEventListener('click', ()=> addTask(newTask.value));
+newTask.addEventListener('keydown', e=>{
+  if(e.key==='Enter') addTask(newTask.value);
+});
 
-    if(taskToggle.length>0){
-        var newToggle = taskToggle[0];
+listEl.addEventListener('click', e=>{
+  const li = e.target.closest('li.item'); if(!li) return;
+  const id = Number(li.dataset.id);
+  if(e.target.closest('.remove')){ removeTask(id); return; }
+  if(e.target.closest('.edit')){ startInlineEdit(li, id); return; }
+  if(e.target.matches('input.checkbox')){ toggleTask(id); return; }
+});
 
-        newToggle.done= !newToggle.done;
-
-        
-            let flagToggle='false';
-        
-            if(newToggle.done){
-                    flagToggle == 'true';
-            }
-            else{
-                flagToggle == 'false';
-        }
-
-        renderList();
-        
-        return;
-    }
-    
-   
+function startInlineEdit(li, id){
+  const t = tasks.find(t=>t.id===id); if(!t) return;
+  const titleEl = li.querySelector('.title');
+  const input = document.createElement('input');
+  input.className = 'edit-input'; input.value = t.text; input.setAttribute('aria-label','Edit task');
+  titleEl.replaceWith(input); input.focus();
+  const done = ()=> updateTask(id, input.value);
+  input.addEventListener('blur', done);
+  input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') done(); if(e.key==='Escape') render(); });
 }
 
+document.getElementById('clearCompleted').addEventListener('click', ()=>{ clearCompleted(); toastMsg('Cleared completed'); });
+document.getElementById('selectAll').addEventListener('click', toggleAll);
 
-function deleteToDo(countId){
+document.querySelector('.filters').addEventListener('click', e=>{
+  const btn = e.target.closest('.chip'); if(!btn) return;
+  filter = btn.dataset.filter; render();
+});
 
-    const counts = tasks.filter(function(task){
-       return  task.count != countId ;
- 
-    });
-
-    console.log(counts);
-
-    tasks = counts ;
-    renderList();
-
-}
-
-//for collecting data from Click  button  
-function saveData(){
-    var inputdata = typedText.value;
-    if(!inputdata){
-         popAlert("Text feild Can't be Empty !!");
-         return;
-    }
-    else{
-        
-        const task={
-            count : count++ ,
-            data :inputdata 
-        }
-        
-        tasks.push(task);
-        popAlert("Task Added !!");
-        renderList();
-        
-    }
-
-    typedText.value='';
-    
-}
-
-function listenEvent(e){
-
-    console.log(e.target ,"Listener");
-
-    const targetBtn = e.target;
-
-    if(targetBtn.className ==='delete'){
-        const taskIds = targetBtn.id;
-        deleteToDo(taskIds);
-        popAlert("Deleted Task");
-        return;
-    }
-    else if(targetBtn.className==="custom-checkbox"){
-        const taskIds = targetBtn.id;
-        markAsComplete(taskIds);
-    }
-    
-}
-
-document.addEventListener('click',listenEvent);
-// for collecting data from Enter button
-
-typedText.addEventListener('keyup',function dataCollect(e){
-   if(e.key ==='Enter'){
-    var data = e.target.value;
-    if(!data){
-         popAlert("Text feild Can't be Empty !!");
-         return;
-    }
-    else{
-        
-        const task={
-            count : count++ ,
-            data,
-            done:false
-        }
-        
-        tasks.push(task);
-        popAlert("Task Added !!");
-        renderList();
-        
-    }
-
-    e.target.value='';
-
-   }
-
-
-  
-
-})
-
-
-
-
-
+// initial paint
+render();
