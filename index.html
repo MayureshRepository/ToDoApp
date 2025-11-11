@@ -3,24 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>To‑Do — Upgraded</title>
+  <title>To-Do — Glassy</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="todo.css">
 </head>
 <body>
-  <main class="app" aria-labelledby="title">
-    <header>
-      <h1 id="title">To‑Do App</h1>
-      <p class="subtitle">Fast. Editable. Saved on this device.</p>
+  <!-- Ambient background blobs -->
+  <div class="ambient">
+    <span class="b1"></span>
+    <span class="b2"></span>
+    <span class="b3"></span>
+  </div>
+
+  <main class="app glass" aria-labelledby="title">
+    <header class="glass-header">
+      <div class="heading">
+        <h1 id="title">Your Day, Clear & Focused</h1>
+        <p class="subtitle">Glassy to-dos with gentle motion & focus</p>
+      </div>
+      <div class="progress">
+        <div class="progress-bar" id="progressBar" style="width:0%"></div>
+      </div>
     </header>
 
-    <section class="input-row" aria-label="Add a task">
+    <section class="input-row glass" aria-label="Add a task">
       <div class="input">
-        <input id="newTask" type="text" placeholder="Add a task and hit Enter…" autocomplete="off" />
+        <svg class="icon leading" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input id="newTask" type="text" placeholder="Type a task and press Enter…" autocomplete="off" />
       </div>
-      <button id="addBtn" class="btn btn-primary" aria-label="Add task">Save</button>
+      <button id="addBtn" class="btn btn-primary" aria-label="Add task">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Add
+      </button>
     </section>
 
     <div class="toolbar">
@@ -37,18 +57,28 @@
 
     <ul id="list" class="list" aria-live="polite" aria-label="Task list"></ul>
 
-    <div class="footer">
+    <div class="footer glass">
       <span class="counter"> <span id="leftCount">0</span> tasks left</span>
       <span class="meta" id="meta"></span>
     </div>
   </main>
 
+  <!-- Floating add button for quick entry -->
+  <button id="fab" class="fab" title="Add task">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+
   <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <template id="itemTemplate">
-    <li class="item">
-      <input type="checkbox" class="checkbox" />
-      <div>
+    <li class="item glass">
+      <label class="checkwrap">
+        <input type="checkbox" class="checkbox" />
+        <span class="checkmark" aria-hidden="true"></span>
+      </label>
+      <div class="content">
         <div class="title"></div>
         <div class="meta"></div>
       </div>
