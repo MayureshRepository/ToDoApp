@@ -1,93 +1,149 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>To-Do — Glassy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0a16" id="themeColor" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Tasks — Clear & Focused</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="todo.css">
+  <script>
+    // Dark is the default; apply a saved choice before paint to avoid a flash
+    try {
+      const t = localStorage.getItem('todo-theme') === 'light' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = t;
+      if (t === 'light') document.getElementById('themeColor')?.setAttribute('content', '#f4f3ff');
+    } catch {}
+  </script>
 </head>
 <body>
-  <!-- Ambient background blobs -->
-  <div class="ambient">
-    <span class="b1"></span>
-    <span class="b2"></span>
-    <span class="b3"></span>
+  <!-- Aurora background -->
+  <div class="aurora" aria-hidden="true">
+    <span class="a1"></span>
+    <span class="a2"></span>
+    <span class="a3"></span>
   </div>
+  <div class="grain" aria-hidden="true"></div>
 
-  <main class="app glass" aria-labelledby="title">
-    <header class="glass-header">
-      <div class="heading">
-        <h1 id="title">Your Day, Clear & Focused</h1>
-        <p class="subtitle">To-dos with gentle motion & focus</p>
+  <main class="app" aria-labelledby="title">
+    <!-- Header -->
+    <header class="hero">
+      <div class="hero-text">
+        <p class="eyebrow" id="today"></p>
+        <h1 id="title"><span id="greeting">Hello</span> <span class="wave">👋</span></h1>
+        <p class="subtitle" id="subtitle">Let's make today count.</p>
       </div>
-      <div class="progress">
-        <div class="progress-bar" id="progressBar" style="width:0%"></div>
+
+      <div class="hero-side">
+        <button id="themeToggle" class="icon-btn theme-toggle" aria-label="Switch to light mode" title="Switch theme">
+          <svg class="icon sun" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <svg class="icon moon" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+
+        <div class="ring" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar">
+          <svg viewBox="0 0 120 120">
+            <defs>
+              <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="var(--brand)"/>
+                <stop offset="100%" stop-color="var(--brand-2)"/>
+              </linearGradient>
+            </defs>
+            <circle class="ring-track" cx="60" cy="60" r="52"/>
+            <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52"/>
+          </svg>
+          <div class="ring-label">
+            <strong id="pct">0%</strong>
+            <span>done</span>
+          </div>
+        </div>
       </div>
     </header>
 
-    <section class="input-row glass" aria-label="Add a task">
-      <div class="input">
-        <svg class="icon leading" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        <input id="newTask" type="text" placeholder="Type a task and press Enter…" autocomplete="off" />
+    <!-- Stats -->
+    <section class="stats" aria-label="Summary">
+      <div class="stat">
+        <span class="stat-num" id="statTotal">0</span>
+        <span class="stat-label">Total</span>
       </div>
-      <button id="addBtn" class="btn btn-primary" aria-label="Add task">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        Add
-      </button>
+      <div class="stat">
+        <span class="stat-num" id="leftCount">0</span>
+        <span class="stat-label">Active</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" id="statDone">0</span>
+        <span class="stat-label">Completed</span>
+      </div>
     </section>
 
-    <div class="toolbar">
-      <div class="filters" role="tablist" aria-label="Filters">
-        <button class="chip" data-filter="all" aria-pressed="true">All</button>
-        <button class="chip" data-filter="active" aria-pressed="false">Active</button>
-        <button class="chip" data-filter="completed" aria-pressed="false">Completed</button>
+    <!-- Composer -->
+    <form class="composer" id="composer" aria-label="Add a task" autocomplete="off">
+      <div class="input">
+        <svg class="icon leading" viewBox="0 0 24 24" fill="none">
+          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input id="newTask" type="text" placeholder="What needs to be done?" maxlength="200" />
+        <kbd class="hint">Enter ↵</kbd>
       </div>
-      <div class="row">
-        <button id="clearCompleted" class="btn btn-ghost">Clear completed</button>
-        <button id="selectAll" class="btn btn-ghost">Toggle all</button>
+      <button id="addBtn" type="submit" class="btn btn-primary" aria-label="Add task">
+        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span class="btn-label">Add task</span>
+      </button>
+    </form>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="segmented" role="tablist" aria-label="Filters">
+        <span class="seg-indicator" aria-hidden="true"></span>
+        <button class="chip" role="tab" data-filter="all" aria-pressed="true">All <em data-count="all">0</em></button>
+        <button class="chip" role="tab" data-filter="active" aria-pressed="false">Active <em data-count="active">0</em></button>
+        <button class="chip" role="tab" data-filter="completed" aria-pressed="false">Done <em data-count="completed">0</em></button>
+      </div>
+      <div class="row actions">
+        <button id="selectAll" class="btn btn-ghost" title="Mark all done / undone">
+          <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M3 12l5 5L20 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Toggle all
+        </button>
+        <button id="clearCompleted" class="btn btn-ghost danger" title="Remove completed tasks">
+          <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Clear done
+        </button>
       </div>
     </div>
 
+    <!-- List -->
     <ul id="list" class="list" aria-live="polite" aria-label="Task list"></ul>
 
-    <div class="footer glass">
-      <span class="counter"> <span id="leftCount">0</span> tasks left</span>
+    <footer class="footer">
       <span class="meta" id="meta"></span>
-    </div>
+      <span class="tip">Tip: double-click a task to edit · press <kbd>/</kbd> to add</span>
+    </footer>
   </main>
-
-  <!-- Floating add button for quick entry -->
-  <button id="fab" class="fab" title="Add task">
-    <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-  </button>
 
   <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <template id="itemTemplate">
-    <li class="item glass">
+    <li class="item">
       <label class="checkwrap">
-        <input type="checkbox" class="checkbox" />
-        <span class="checkmark" aria-hidden="true"></span>
+        <input type="checkbox" class="checkbox" aria-label="Mark task complete" />
+        <span class="checkmark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
       </label>
       <div class="content">
         <div class="title"></div>
         <div class="meta"></div>
       </div>
-      <div class="row">
+      <div class="row item-actions">
         <button class="icon-btn edit" title="Edit" aria-label="Edit task">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 20h4l10.5-10.5a2.121 2.121 0 1 0-3-3L5 17v3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 20h4l10.5-10.5a2.121 2.121 0 1 0-3-3L5 17v3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
         <button class="icon-btn remove" title="Delete" aria-label="Delete task">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
     </li>
