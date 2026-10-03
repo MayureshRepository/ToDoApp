@@ -4,6 +4,14 @@ A clean, modern to-do list that runs entirely in the browser, built with **plain
 
 Dark mode is the default, with a one-tap light theme. The layout is designed for phones first, and your tasks are saved in your browser.
 
+## 🎬 Demo
+
+![ToDoApp demo](demo/todo-demo.gif)
+
+▶️ [Watch the full-quality video (MP4, 1 min)](demo/todo-demo.mp4)
+
+## 📸 Screenshots
+
 ![Desktop — dark theme](screenshots/desktop-dark.png)
 
 <p align="center">
@@ -86,6 +94,7 @@ ToDoApp/
 ├── todo.css        # Theme tokens (dark default + light), layout, animations, mobile styles
 ├── todo.js         # State, localStorage persistence, rendering, events, theme toggle
 ├── screenshots/    # Images used in this README
+├── demo/           # Demo video (MP4) and GIF
 └── README.md
 ```
 
